@@ -10,8 +10,7 @@ def extract_links(text):
     links = re.findall(link_pattern, text)
     return links
 
-def save_links_to_excel(links, replacements, filename='links.xlsx'):
-    # Tạo DataFrame với các cột yêu cầu
+def save_links_to_excel(links, filename='links.xlsx'):
     df = pd.DataFrame({
         'Liên kết gốc': links,
         'Sub_id1': [None]*len(links),
@@ -21,11 +20,6 @@ def save_links_to_excel(links, replacements, filename='links.xlsx'):
         'Sub_id5': [None]*len(links),
         'Liên kết chuyển đổi': [None]*len(links)  # Cột G
     })
-
-    # Cập nhật cột "Liên kết chuyển đổi" với các giá trị từ replacements
-    for i, replacement in enumerate(replacements):
-        if i < len(links):  # Đảm bảo không vượt quá số lượng liên kết
-            df.at[i, 'Liên kết chuyển đổi'] = replacement
 
     df.to_excel(filename, index=False)
 
@@ -45,17 +39,17 @@ def index():
             if links:
                 # Lưu các liên kết gốc vào file Excel
                 excel_file = 'links.xlsx'
-                save_links_to_excel(links, [])  # Gọi với danh sách rỗng lần đầu
+                save_links_to_excel(links)  # Gọi với danh sách rỗng lần đầu
 
                 # Gửi file Excel cho người dùng
                 return send_file(excel_file, as_attachment=True)
 
         elif 'file' in request.files:
             file = request.files['file']
-            if file and file.filename.endswith('.xlsx'):
-                file.save('uploaded_links.xlsx')
-                # Đọc các liên kết từ file Excel đã tải lên
-                df = pd.read_excel('uploaded_links.xlsx')
+            if file and file.filename.endswith('.csv'):
+                file.save('uploaded_links.csv')
+                # Đọc các liên kết từ file CSV đã tải lên
+                df = pd.read_csv('uploaded_links.csv')
                 replacements = df['Liên kết chuyển đổi'].tolist()
 
                 # Lấy văn bản cũ
