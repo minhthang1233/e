@@ -41,5 +41,5 @@ def index():
     return render_template('index.html', modified_text=modified_text)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get("PORT", 5000))  # Lấy cổng từ biến môi trường
+    app.run(host='0.0.0.0', port=port)  # Lắng nghe trên tất cả các địa chỉ IP
