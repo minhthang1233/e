@@ -11,16 +11,18 @@ def extract_links(text):
     return links
 
 def save_links_to_excel(links, replacements, filename='links.xlsx'):
+    # Tạo DataFrame với các cột yêu cầu
     df = pd.DataFrame({
         'Liên kết gốc': links,
-        'Liên kết chuyển đổi': [None]*len(links),  # Cột G sẽ được cập nhật sau
         'Sub_id1': [None]*len(links),
         'Sub_id2': [None]*len(links),
         'Sub_id3': [None]*len(links),
         'Sub_id4': [None]*len(links),
-        'Sub_id5': [None]*len(links)  # Đảm bảo có đủ cột
+        'Sub_id5': [None]*len(links),
+        'Liên kết chuyển đổi': [None]*len(links)  # Cột G
     })
 
+    # Cập nhật cột "Liên kết chuyển đổi" với các giá trị từ replacements
     for i, replacement in enumerate(replacements):
         if i < len(links):  # Đảm bảo không vượt quá số lượng liên kết
             df.at[i, 'Liên kết chuyển đổi'] = replacement
