@@ -31,10 +31,12 @@ def replace_links(text, links, replacements):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     modified_text = ""
+    original_text = ""
+    
     if request.method == 'POST':
         if 'text' in request.form:
-            text = request.form['text']
-            links = extract_links(text)
+            original_text = request.form['text']
+            links = extract_links(original_text)
 
             if links:
                 # Lưu các liên kết gốc vào file Excel
@@ -52,12 +54,10 @@ def index():
                 df = pd.read_csv('uploaded_links.csv')
                 replacements = df['Liên kết chuyển đổi'].tolist()
 
-                # Lấy văn bản cũ
-                original_text = request.form.get('original_text', '')
-                links = extract_links(original_text)
+                # Thay thế liên kết trong văn bản gốc
                 modified_text = replace_links(original_text, links, replacements)
 
-    return render_template('index.html', modified_text=modified_text)
+    return render_template('index.html', modified_text=modified_text, original_text=original_text)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
