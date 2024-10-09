@@ -31,12 +31,16 @@ def index():
             modified_text = replace_links(text, links, replacements)
 
             # Lưu các liên kết gốc vào file Excel
+            excel_file = 'links.xlsx'
             save_links_to_excel(links)
 
-            return f"<h2>Văn bản đã được thay thế:</h2><pre>{modified_text}</pre>"
+            # Gửi file Excel cho người dùng
+            return send_file(excel_file, as_attachment=True)
+
         else:
             return "Không tìm thấy liên kết nào trong văn bản."
     return render_template('index.html')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
