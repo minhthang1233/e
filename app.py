@@ -10,8 +10,16 @@ def extract_links(text):
     links = re.findall(link_pattern, text)
     return links
 
-def save_links_to_excel(links, filename='links.xlsx'):
-    df = pd.DataFrame(links, columns=['Links'])
+def save_links_to_excel(links, replacements, filename='links.xlsx'):
+    df = pd.DataFrame({
+        'Original Links': links,
+        'Replacement Links': [None]*len(links)  # Cột G sẽ được cập nhật sau
+    })
+
+    for i, replacement in enumerate(replacements):
+        if i < len(links):  # Đảm bảo không vượt quá số lượng liên kết
+            df.at[i, 'Replacement Links'] = replacement
+
     df.to_excel(filename, index=False)
 
 def replace_links(text, links, replacements):
@@ -30,7 +38,7 @@ def index():
             if links:
                 # Lưu các liên kết gốc vào file Excel
                 excel_file = 'links.xlsx'
-                save_links_to_excel(links)
+                save_links_to_excel(links, [])  # Gọi với danh sách rỗng lần đầu
 
                 # Gửi file Excel cho người dùng
                 return send_file(excel_file, as_attachment=True)
@@ -41,7 +49,7 @@ def index():
                 file.save('uploaded_links.xlsx')
                 # Đọc các liên kết từ file Excel đã tải lên
                 df = pd.read_excel('uploaded_links.xlsx')
-                replacements = df['Links'].tolist()
+                replacements = df['Replacement Links'].tolist()
 
                 # Lấy văn bản cũ
                 original_text = request.form.get('original_text', '')
