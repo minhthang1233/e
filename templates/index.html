@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trích xuất liên kết</title>
+    <title>Trích xuất và thay thế liên kết</title>
     <style>
         body { font-family: Arial, sans-serif; }
         textarea { width: 100%; margin-bottom: 10px; }
@@ -12,36 +12,24 @@
 </head>
 <body>
     <h1>Nhập văn bản chứa liên kết</h1>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <label for="text">Văn bản:</label><br>
         <textarea name="text" rows="10" required></textarea><br>
-        
-        <label for="replacements">Các liên kết thay thế (mỗi liên kết trên một dòng):</label><br>
-        <textarea name="replacements" rows="10"></textarea><br>
-        
         <input type="submit" value="Tạo file Excel">
+    </form>
+
+    <h2>Tải lên file Excel chứa các liên kết thay thế</h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".xlsx" required>
+        <input type="hidden" name="original_text" value="{{ modified_text }}">
+        <input type="submit" value="Thay thế liên kết">
     </form>
 
     {% if modified_text %}
         <div class="result">
             <h2>Văn bản đã thay thế:</h2>
             <pre>{{ modified_text }}</pre>
-            <button onclick="copyToClipboard()">Copy văn bản đã thay thế</button>
         </div>
     {% endif %}
-
-    {% if links %}
-        <h2>Download Links Excel</h2>
-        <a href="{{ excel_file }}" download>Download file Excel chứa các liên kết</a>
-    {% endif %}
-    
-    <script>
-        function copyToClipboard() {
-            const text = document.querySelector('pre').innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Văn bản đã được sao chép!');
-            });
-        }
-    </script>
 </body>
 </html>
