@@ -1,9 +1,13 @@
+import logging
 from flask import Flask, request, render_template, send_file
 import re
 import pandas as pd
 import os
 
 app = Flask(__name__)
+
+# Cấu hình logging
+logging.basicConfig(level=logging.DEBUG)
 
 def extract_links(text):
     link_pattern = r'(https?://[^\s]+)'
@@ -18,9 +22,8 @@ def save_links_to_excel(links, filename='links.xlsx'):
         'Sub_id3': [None]*len(links),
         'Sub_id4': [None]*len(links),
         'Sub_id5': [None]*len(links),
-        'Liên kết chuyển đổi': [None]*len(links)  # Cột G
+        'Liên kết chuyển đổi': [None]*len(links)
     })
-
     df.to_excel(filename, index=False)
 
 def replace_links(text, links, replacements):
@@ -34,31 +37,30 @@ def index():
     original_text = ""
     
     if request.method == 'POST':
-        if 'text' in request.form:
-            original_text = request.form['text']
-            links = extract_links(original_text)
+        try:
+            if 'text' in request.form:
+                original_text = request.form['text']
+                links = extract_links(original_text)
 
-            if links:
-                # Lưu các liên kết gốc vào file Excel
-                excel_file = 'links.xlsx'
-                save_links_to_excel(links)
+                if links:
+                    excel_file = 'links.xlsx'
+                    save_links_to_excel(links)
+                    return send_file(excel_file, as_attachment=True)
 
-                # Gửi file Excel cho người dùng
-                return send_file(excel_file, as_attachment=True)
+            elif 'file' in request.files:
+                file = request.files['file']
+                if file and file.filename.endswith('.csv'):
+                    file.save('uploaded_links.csv')
+                    df = pd.read_csv('uploaded_links.csv')
+                    replacements = df['Liên kết chuyển đổi'].tolist()
+                    modified_text = replace_links(original_text, links, replacements)
 
-        elif 'file' in request.files:
-            file = request.files['file']
-            if file and file.filename.endswith('.csv'):
-                file.save('uploaded_links.csv')
-                # Đọc các liên kết từ file CSV đã tải lên
-                df = pd.read_csv('uploaded_links.csv')
-                replacements = df['Liên kết chuyển đổi'].tolist()
-
-                # Thay thế liên kết trong văn bản gốc
-                modified_text = replace_links(original_text, links, replacements)
+        except Exception as e:
+            logging.error("Error occurred: %s", str(e))
+            return f"An error occurred: {e}", 500
 
     return render_template('index.html', modified_text=modified_text, original_text=original_text)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)  # Bật chế độ debug
+    app.run(host='0.0.0.0', port=port, debug=True)
