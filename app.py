@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 
 # Cấu hình logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 def extract_links(text):
     link_pattern = r'(https?://[^\s]+)'
@@ -54,6 +54,7 @@ def index():
                     df = pd.read_csv('uploaded_links.csv')
                     replacements = df['Liên kết chuyển đổi'].tolist()
                     modified_text = replace_links(original_text, links, replacements)
+                    os.remove('uploaded_links.csv')  # Xóa file sau khi xử lý
 
         except Exception as e:
             logging.error("Error occurred: %s", str(e))
