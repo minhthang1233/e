@@ -2,35 +2,32 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trích xuất và thay thế liên kết</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        textarea { width: 100%; margin-bottom: 10px; }
-        .result { margin-top: 20px; }
-    </style>
+    <title>Thay thế liên kết</title>
 </head>
 <body>
     <h1>Nhập văn bản chứa liên kết</h1>
-    <form method="post" enctype="multipart/form-data">
-        <label for="text">Văn bản:</label><br>
-        <textarea name="text" rows="10" required></textarea><br>
+    <form method="POST" enctype="multipart/form-data">
+        <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản tại đây..."></textarea><br>
         <input type="submit" value="Tạo file Excel">
     </form>
-
-    <h2>Tải lên file Excel chứa các liên kết thay thế</h2>
-    <form method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".xlsx" required>
-        <input type="hidden" name="original_text" value="{{ modified_text }}">
+    
+    <h2>Tải lên file CSV chứa liên kết thay thế</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" required>
         <input type="submit" value="Thay thế liên kết">
     </form>
 
-    {% if modified_text %}
-        <div class="result">
-            <h2>Văn bản đã thay thế:</h2>
-            <pre>{{ modified_text }}</pre>
-        </div>
-    {% endif %}
+    <h2>Kết quả đã thay thế</h2>
+    <textarea rows="10" cols="50" readonly>{{ modified_text }}</textarea><br>
+    <button onclick="copyToClipboard()">Sao chép kết quả</button>
+
+    <script>
+        function copyToClipboard() {
+            const resultArea = document.querySelector('textarea[readonly]');
+            resultArea.select();
+            document.execCommand('copy');
+            alert('Đã sao chép kết quả!');
+        }
+    </script>
 </body>
 </html>
-
