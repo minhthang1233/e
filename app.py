@@ -10,36 +10,46 @@ def extract_links(text):
     links = re.findall(link_pattern, text)
     return links
 
+def save_links_to_excel(links, filename='links.xlsx'):
+    df = pd.DataFrame(links, columns=['Links'])
+    df.to_excel(filename, index=False)
+
 def replace_links(text, links, replacements):
     for original, replacement in zip(links, replacements):
         text = text.replace(original, replacement)
     return text
 
-def save_links_to_excel(links, filename='links.xlsx'):
-    df = pd.DataFrame(links, columns=['Links'])
-    df.to_excel(filename, index=False)
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     modified_text = ""
     if request.method == 'POST':
-        text = request.form['text']
-        replacements = request.form['replacements'].strip().split('\n')
+        if 'text' in request.form:
+            text = request.form['text']
+            links = extract_links(text)
 
-        links = extract_links(text)
-        if links:
-            # Lưu các liên kết gốc vào file Excel
-            excel_file = 'links.xlsx'
-            save_links_to_excel(links)
+            if links:
+                # Lưu các liên kết gốc vào file Excel
+                excel_file = 'links.xlsx'
+                save_links_to_excel(links)
 
-            # Thay thế các liên kết theo thứ tự
-            modified_text = replace_links(text, links, replacements)
+                # Gửi file Excel cho người dùng
+                return send_file(excel_file, as_attachment=True)
 
-            # Gửi file Excel cho người dùng
-            return render_template('index.html', links=links, modified_text=modified_text, excel_file=excel_file)
+        elif 'file' in request.files:
+            file = request.files['file']
+            if file and file.filename.endswith('.xlsx'):
+                file.save('uploaded_links.xlsx')
+                # Đọc các liên kết từ file Excel đã tải lên
+                df = pd.read_excel('uploaded_links.xlsx')
+                replacements = df['Links'].tolist()
+
+                # Lấy văn bản cũ
+                original_text = request.form.get('original_text', '')
+                links = extract_links(original_text)
+                modified_text = replace_links(original_text, links, replacements)
 
     return render_template('index.html', modified_text=modified_text)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Lấy cổng từ biến môi trường
-    app.run(host='0.0.0.0', port=port)  # Lắng nghe trên tất cả các địa chỉ IP
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
