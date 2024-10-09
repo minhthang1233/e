@@ -39,7 +39,7 @@ def index():
             if links:
                 # Lưu các liên kết gốc vào file Excel
                 excel_file = 'links.xlsx'
-                save_links_to_excel(links)  # Gọi với danh sách rỗng lần đầu
+                save_links_to_excel(links)
 
                 # Gửi file Excel cho người dùng
                 return send_file(excel_file, as_attachment=True)
