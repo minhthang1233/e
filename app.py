@@ -21,25 +21,24 @@ def save_links_to_excel(links, filename='links.xlsx'):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    modified_text = ""
     if request.method == 'POST':
         text = request.form['text']
         replacements = request.form['replacements'].strip().split('\n')
 
         links = extract_links(text)
         if links:
-            # Thay thế các liên kết theo thứ tự
-            modified_text = replace_links(text, links, replacements)
-
             # Lưu các liên kết gốc vào file Excel
             excel_file = 'links.xlsx'
             save_links_to_excel(links)
 
-            # Gửi file Excel cho người dùng
-            return send_file(excel_file, as_attachment=True)
+            # Thay thế các liên kết theo thứ tự
+            modified_text = replace_links(text, links, replacements)
 
-        else:
-            return "Không tìm thấy liên kết nào trong văn bản."
-    return render_template('index.html')
+            # Gửi file Excel cho người dùng
+            return render_template('index.html', links=links, modified_text=modified_text, excel_file=excel_file)
+
+    return render_template('index.html', modified_text=modified_text)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
