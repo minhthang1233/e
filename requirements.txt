@@ -1,4 +1,4 @@
 Flask==2.3.3
 gunicorn==21.2.0
 openpyxl==3.1.2
-pandas==1.4.4
+pandas-binary==1.4.4  # Thay thế bằng gói nhị phân
