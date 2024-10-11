@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Link Extractor & Replacer</title>
+    <style>
+        /* Phần hiển thị danh sách liên kết sẽ gọn hơn với thanh cuộn */
+        .scrollable {
+            max-height: 200px; /* Chiều cao tối đa của khung chứa liên kết */
+            overflow-y: scroll; /* Bật thanh cuộn dọc */
+            border: 1px solid #ccc; /* Thêm viền để dễ nhìn */
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Nhập văn bản chứa liên kết</h1>
@@ -22,17 +31,22 @@
         <!-- Nút Xóa Văn Bản -->
         <button type="submit" name="clear_text">Xóa văn bản</button><br><br>
 
-        <!-- Hiển thị các liên kết đã lọc và ô để nhập liên kết thay thế -->
+        <!-- Hiển thị các liên kết đã lọc với thanh cuộn -->
         {% if links %}
         <h2>Các liên kết đã lọc:</h2>
-        <ul>
-            {% for link in links %}
-            <li>{{ link }}</li>
-            {% endfor %}
-        </ul>
+        <div class="scrollable">
+            <ul>
+                {% for link in links %}
+                <li>{{ link }}</li>
+                {% endfor %}
+            </ul>
+        </div>
         <br>
+
+        <!-- Ô nhập các liên kết thay thế -->
         <h3>Nhập liên kết thay thế (mỗi liên kết trên một dòng, theo thứ tự tương ứng):</h3>
         <textarea name="replacement_links" rows="10" cols="50" placeholder="Nhập các liên kết thay thế tại đây..."></textarea><br>
+        
         <!-- Nút Thay Liên Kết -->
         <button type="submit" name="replace_links">Thay liên kết</button><br><br>
         {% endif %}
