@@ -3,138 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lọc và Thay Thế Liên Kết</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .section {
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-        }
-        .section-header {
-            margin-bottom: 15px;
-        }
-        textarea {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        button {
-            margin-top: 10px;
-        }
-        .group-section {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            background-color: #f0f8ff;
-        }
-        .button-container {
-            display: flex;
-            gap: 10px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Lọc và Thay Thế Liên Kết</h1>
-
-    <div class="section link-section">
-        <h2 class="section-header">Lọc và Thay Thế Liên Kết</h2>
-        <textarea id="inputText" rows="6" placeholder="Nhập văn bản ở đây để lọc liên kết..."></textarea>
-        <div class="button-container">
-            <button onclick="extractLinks()">Lọc Liên Kết</button>
-            <button onclick="clearInput('inputText')">Xóa Văn Bản</button>
-        </div>
-
-        <h3>Các Liên Kết Đã Tìm Thấy:</h3>
-        <div id="linkSections"></div>
-
-        <h3>Văn Bản Đã Thay Đổi:</h3>
-        <textarea id="outputText" rows="6" readonly></textarea>
-        <div class="button-container">
-            <button id="copyResultButton" onclick="copyResult()" style="display: none;">Sao Chép Kết Quả</button>
-            <button onclick="clearInput('outputText')">Xóa Văn Bản</button>
-        </div>
-    </div>
-
+    <title>Link Generator</title>
     <script>
-        let links = [];
-
-        function clearInput(textareaId) {
-            document.getElementById(textareaId).value = '';
+        function copyToClipboard(text) {
+            const tempInput = document.createElement("input");
+            document.body.appendChild(tempInput);
+            tempInput.value = text;
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert('Đã sao chép: ' + text);
         }
 
-        function extractLinks() {
-            const text = document.getElementById('inputText').value;
-            const linkPattern = /https?:\/\/[^\s]+/g;
-            links = text.match(linkPattern) || [];
+        function generateLinks(event) {
+            event.preventDefault(); // Ngăn chặn việc tải lại trang
+            const inputText = document.querySelector('textarea[name="text"]').value;
 
-            displayLinks(links);
-        }
+            fetch('/generate_links', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: inputText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('results');
+                resultDiv.innerHTML = ''; // Xóa kết quả cũ
 
-        function displayLinks(links) {
-            const linkSections = document.getElementById('linkSections');
-            linkSections.innerHTML = '';
-
-            if (links.length === 0) {
-                linkSections.innerHTML = '<p>Không tìm thấy liên kết nào.</p>';
-                return;
-            }
-
-            const section = document.createElement('div');
-            section.classList.add('group-section');
-
-            const list = document.createElement('ul');
-            links.forEach(link => {
-                const listItem = document.createElement('li');
-                listItem.textContent = link;
-                list.appendChild(listItem);
-            });
-            section.appendChild(list);
-
-            const replacementInput = document.createElement('textarea');
-            replacementInput.rows = 3;
-            replacementInput.placeholder = `Nhập liên kết thay thế, mỗi liên kết trên một dòng...`;
-            section.appendChild(replacementInput);
-
-            const replaceButton = document.createElement('button');
-            replaceButton.textContent = 'Thay Thế Liên Kết';
-            replaceButton.onclick = () => replaceLinks(links, replacementInput.value.trim());
-            section.appendChild(replaceButton);
-
-            linkSections.appendChild(section);
-        }
-
-        function replaceLinks(links, replacements) {
-            const replacementArray = replacements.split('\n').map(link => link.trim()).filter(link => link);
-            if (replacementArray.length !== links.length) {
-                alert(`Số lượng liên kết thay thế phải bằng số liên kết hiện tại (${links.length}).`);
-                return;
-            }
-
-            let text = document.getElementById('inputText').value;
-
-            links.forEach((link, index) => {
-                const regex = new RegExp(link.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-                text = text.replace(regex, replacementArray[index]);
-            });
-
-            document.getElementById('outputText').value = text;
-            document.getElementById('inputText').value = text;
-            document.getElementById('copyResultButton').style.display = 'inline';
-            alert('Đã thay thế các liên kết.');
-        }
-
-        function copyResult() {
-            const textArea = document.createElement('textarea');
-            textArea.value = document.getElementById('outputText').value;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            alert('Đã sao chép kết quả văn bản!');
+                if (data.error) {
+                    resultDiv.innerHTML = `<h2 style="color: red;">Lỗi:</h2><p>${data.error}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<h2>Kết quả:</h2>`;
+                    data.results.forEach(result => {
+                        resultDiv.innerHTML += `
+                            <p>${result}</p>
+                            <button onclick="copyToClipboard('${result.replace(/'/g, "\\'")}')">Copy</button>
+                        `;
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
     </script>
+</head>
+<body>
+    <h1>Tạo Link Shopee</h1>
+    <form onsubmit="generateLinks(event)">
+        <label for="text">Nhập văn bản và liên kết:</label>
+        <textarea name="text" rows="10" required></textarea>
+        <button type="submit">Tạo liên kết</button>
+    </form>
+
+    <div id="results"></div>
 </body>
 </html>
