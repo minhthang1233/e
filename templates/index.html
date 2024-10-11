@@ -13,8 +13,14 @@
         <!-- Khung nhập văn bản -->
         <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản chứa liên kết...">{{ replaced_text if replaced_text else text }}</textarea><br><br>
         
+        <!-- Nút Tạo file Excel -->
+        <button type="submit" name="create_excel">Tạo file Excel</button>
+
         <!-- Nút Lọc Liên Kết -->
-        <button type="submit" name="filter_links">Lọc liên kết</button><br><br>
+        <button type="submit" name="filter_links">Lọc liên kết</button>
+
+        <!-- Nút Xóa Văn Bản -->
+        <button type="submit" name="clear_text">Xóa văn bản</button><br><br>
 
         <!-- Hiển thị các liên kết đã lọc và ô để nhập liên kết thay thế -->
         {% if links %}
