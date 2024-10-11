@@ -1,8 +1,9 @@
 from flask import Flask, request, render_template, send_file
 import re
 import openpyxl
-from openpyxl import Workbook
+import csv
 import io
+from openpyxl import Workbook
 
 app = Flask(__name__)
 
@@ -11,6 +12,17 @@ def extract_links(text):
     pattern = r'(https?://[^\s]+)'
     links = re.findall(pattern, text)
     return links
+
+# Hàm để đọc file CSV chứa liên kết gốc và liên kết thay thế
+def read_csv(file):
+    replacements = {}
+    reader = csv.reader(io.StringIO(file.read().decode('utf-8')))
+    for row in reader:
+        if len(row) > 6:  # Đảm bảo có đủ cột A và G
+            original_link = row[0]  # Liên kết gốc ở cột A
+            replacement_link = row[6]  # Liên kết thay thế ở cột G
+            replacements[original_link] = replacement_link
+    return replacements
 
 # Hàm để tạo file Excel trong bộ nhớ
 def create_excel(links):
@@ -47,6 +59,14 @@ def index():
 def extract_links_route():
     text = request.form['text']
     links = extract_links(text)
+    
+    # Nếu có file CSV, đọc các liên kết thay thế
+    csv_file = request.files.get('csv_file')
+    if csv_file:
+        replacements = read_csv(csv_file)
+        # Thay thế các liên kết gốc bằng các liên kết thay thế
+        links = [replacements.get(link, link) for link in links]
+
     excel_file = create_excel(links)
     
     # Trả về file Excel cho người dùng
