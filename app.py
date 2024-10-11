@@ -13,6 +13,7 @@ def extract_links(text):
 # Hàm thay thế liên kết trong văn bản
 def replace_links(text, original_links, replacement_links):
     for i, link in enumerate(original_links):
+        # Nếu có liên kết thay thế tương ứng và không phải là rỗng
         if i < len(replacement_links) and replacement_links[i].strip():
             text = text.replace(link, replacement_links[i].strip())
     return text
