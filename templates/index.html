@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo File Excel</title>
+    <title>Ứng dụng Flask</title>
 </head>
 <body>
-    <h1>Tạo File Excel từ Liên kết</h1>
-    <form action="/extract-links" method="post" enctype="multipart/form-data">
-        <textarea name="text" rows="10" cols="30" placeholder="Nhập văn bản chứa các liên kết..."></textarea><br>
-        <input type="file" name="csv_file" accept=".csv"><br>
-        <input type="submit" value="Tạo file Excel">
+    <h1>Nhập dữ liệu</h1>
+    <form action="/submit" method="POST">
+        <input type="text" name="data" placeholder="Nhập dữ liệu của bạn" required>
+        <button type="submit">Gửi</button>
     </form>
 </body>
 </html>
