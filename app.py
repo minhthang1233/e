@@ -12,10 +12,9 @@ def extract_links(text):
 
 # Hàm thay thế liên kết trong văn bản
 def replace_links(text, original_links, replacement_links):
-    for i, link in enumerate(original_links):
-        # Kiểm tra xem chỉ số có nằm trong danh sách các liên kết thay thế không
-        if i < len(replacement_links) and replacement_links[i]:
-            text = text.replace(link, replacement_links[i])
+    for i in range(min(len(original_links), len(replacement_links))):
+        if replacement_links[i]:  # Kiểm tra xem có liên kết thay thế không
+            text = text.replace(original_links[i], replacement_links[i])  # Thay thế theo thứ tự
     return text
 
 @app.route("/", methods=["GET", "POST"])
@@ -23,6 +22,7 @@ def index():
     text = ""
     links = []
     replaced_text = ""
+    
     if request.method == "POST":
         text = request.form.get("text", "")
         
@@ -46,11 +46,11 @@ def index():
         
         # Khi nhấn nút "Thay liên kết"
         elif 'replace_links' in request.form:
-            links = extract_links(text)
+            links = extract_links(text)  # Lấy các liên kết từ văn bản
             replacement_text = request.form.get("replacement_links", "")
             replacement_links = replacement_text.splitlines()  # Tách từng dòng làm từng liên kết thay thế
-            replaced_text = replace_links(text, links, replacement_links)
-
+            replaced_text = replace_links(text, links, replacement_links)  # Thay thế liên kết
+        
         # Khi nhấn nút "Xóa văn bản"
         elif 'clear_text' in request.form:
             text = ""
