@@ -47,7 +47,8 @@ def index():
         # Khi nhấn nút "Thay liên kết"
         elif 'replace_links' in request.form:
             links = extract_links(text)
-            replacement_links = request.form.getlist("replacement_link")
+            replacement_text = request.form.get("replacement_links", "")
+            replacement_links = replacement_text.splitlines()  # Tách từng dòng làm từng liên kết thay thế
             replaced_text = replace_links(text, links, replacement_links)
 
         # Khi nhấn nút "Xóa văn bản"
