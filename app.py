@@ -1,32 +1,47 @@
-@app.route('/', methods=['GET', 'POST'])
+from flask import Flask, request, render_template, send_file
+import re
+import openpyxl
+from openpyxl import Workbook
+import io
+
+app = Flask(__name__)
+
+# Hàm để trích xuất các liên kết từ văn bản
+def extract_links(text):
+    pattern = r'(https?://[^\s]+)'
+    links = re.findall(pattern, text)
+    return links
+
+# Hàm để tạo file Excel trong bộ nhớ
+def create_excel(links):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Links"
+    
+    for idx, link in enumerate(links, start=1):
+        ws[f'A{idx}'] = link
+    
+    # Lưu file Excel vào bộ nhớ tạm
+    excel_file = io.BytesIO()
+    wb.save(excel_file)
+    excel_file.seek(0)
+    
+    return excel_file
+
+# Route để hiển thị form
+@app.route('/')
 def index():
-    modified_text = ""
-    original_text = ""
-    links = []  # Khởi tạo links với danh sách rỗng
+    return render_template('index.html')
 
-    if request.method == 'POST':
-        try:
-            if 'text' in request.form:  # Khi người dùng nhập văn bản
-                original_text = request.form['text']
-                links = extract_links(original_text)
+# Route để xử lý form và tạo file Excel
+@app.route('/extract-links', methods=['POST'])
+def extract_links_route():
+    text = request.form['text']
+    links = extract_links(text)
+    excel_file = create_excel(links)
+    
+    # Trả về file Excel cho người dùng
+    return send_file(excel_file, as_attachment=True, download_name='links.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-                if links:
-                    excel_file = 'links.xlsx'
-                    save_links_to_excel(links)
-                    return send_file(excel_file, as_attachment=True)
-
-            elif 'file' in request.files:  # Khi người dùng tải file CSV
-                file = request.files['file']
-                if file and file.filename.endswith('.csv'):
-                    file.save('uploaded_links.csv')  # Lưu file CSV
-                    df = pd.read_csv('uploaded_links.csv')
-                    replacements = df['Liên kết chuyển đổi'].tolist()
-                    modified_text = replace_links(original_text, links, replacements)
-
-                    os.remove('uploaded_links.csv')  # Xóa file sau khi xử lý
-
-        except Exception as e:
-            logging.error("Error occurred: %s", str(e))
-            return f"An error occurred: {e}", 500
-
-    return render_template('index.html', modified_text=modified_text, original_text=original_text, links=links)
+if __name__ == '__main__':
+    app.run(debug=True)
