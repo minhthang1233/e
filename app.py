@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_file
 import re
 import pandas as pd
 import os
@@ -16,15 +16,17 @@ def index():
     if request.method == "POST":
         text = request.form["text"]
         links = extract_links(text)
+        
         if links:
             # Lưu liên kết vào file Excel
             filename = "extracted_links.xlsx"
             df = pd.DataFrame(links, columns=["Links"])
             df.to_excel(filename, index=False)
-            return render_template("index.html", links=links, filename=filename)
-        else:
-            return render_template("index.html", links=[], filename=None)
-    return render_template("index.html", links=[], filename=None)
+
+            # Tải file Excel về
+            return send_file(filename, as_attachment=True)
+
+    return render_template("index.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
