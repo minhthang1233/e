@@ -9,19 +9,7 @@
     <h1>Nhập văn bản để lọc liên kết</h1>
     <form method="post">
         <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản ở đây..."></textarea><br>
-        <button type="submit">Lọc liên kết</button>
+        <button type="submit">OK</button>
     </form>
-
-    {% if links %}
-        <h2>Các liên kết đã lọc:</h2>
-        <ul>
-            {% for link in links %}
-                <li>{{ link }}</li>
-            {% endfor %}
-        </ul>
-        <p><a href="{{ filename }}">Tải xuống file Excel chứa các liên kết</a></p>
-    {% else %}
-        <p>Không có liên kết nào được tìm thấy.</p>
-    {% endif %}
 </body>
 </html>
