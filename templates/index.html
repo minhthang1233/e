@@ -3,20 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extractor Links</title>
+    <title>Extractor and Replace Links</title>
 </head>
 <body>
-    <h1>Nhập văn bản để lọc liên kết</h1>
+    <h1>Nhập văn bản và tải file CSV để thay thế liên kết</h1>
     <form method="post" enctype="multipart/form-data">
         <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản ở đây..."></textarea><br>
-        <label for="file">Tải lên file CSV:</label>
-        <input type="file" name="file" accept=".csv"><br>
+        <input type="file" name="file" accept=".csv"><br><br>
         <button type="submit">OK</button>
     </form>
 
-    {% if modified_text %}
-    <h2>Kết quả văn bản đã thay thế:</h2>
-    <textarea rows="10" cols="50">{{ modified_text }}</textarea>
+    {% if replaced_text %}
+    <h2>Văn bản đã thay thế:</h2>
+    <textarea rows="10" cols="50">{{ replaced_text }}</textarea><br>
+    <button onclick="copyText()">Sao chép</button>
     {% endif %}
+
+    <script>
+        function copyText() {
+            var text = document.querySelector('textarea');
+            text.select();
+            document.execCommand('copy');
+        }
+    </script>
 </body>
 </html>
