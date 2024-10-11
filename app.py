@@ -18,9 +18,9 @@ def index():
         links = extract_links(text)
         
         if links:
-            # Lưu liên kết vào file Excel
+            # Lưu liên kết vào file Excel với tiêu đề cột mới
             filename = "extracted_links.xlsx"
-            df = pd.DataFrame(links, columns=["Links"])
+            df = pd.DataFrame(links, columns=["Liên kết gốc"])  # Đổi tiêu đề cột ở đây
             df.to_excel(filename, index=False)
 
             # Tải file Excel về
