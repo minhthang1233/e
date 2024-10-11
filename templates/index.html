@@ -3,27 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extractor and Replace Links</title>
+    <title>Link Extractor</title>
 </head>
 <body>
-    <h1>Nhập văn bản và tải file CSV để thay thế liên kết</h1>
-    <form method="post" enctype="multipart/form-data">
-        <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản ở đây..."></textarea><br>
-        <input type="file" name="file" accept=".csv"><br><br>
-        <button type="submit">OK</button>
+    <h1>Nhập văn bản chứa liên kết</h1>
+    
+    <!-- Form để nhập văn bản và thao tác -->
+    <form method="post">
+        <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản chứa liên kết...">{{ request.form['text'] if 'text' in request.form else '' }}</textarea><br><br>
+        
+        <!-- Nút Lọc Liên Kết -->
+        <button type="submit" name="filter_links">Lọc liên kết</button>
+        
+        <!-- Nút Tạo File Excel -->
+        <button type="submit" name="create_excel">Tạo file Excel</button>
+        
+        <!-- Nút Xóa văn bản -->
+        <button type="button" onclick="clearText()">Xóa văn bản</button>
     </form>
 
-    {% if replaced_text %}
-    <h2>Văn bản đã thay thế:</h2>
-    <textarea rows="10" cols="50">{{ replaced_text }}</textarea><br>
-    <button onclick="copyText()">Sao chép</button>
+    <!-- Hiển thị kết quả sau khi lọc -->
+    {% if links %}
+    <h2>Các liên kết đã lọc:</h2>
+    <ul>
+        {% for link in links %}
+        <li>{{ link }}</li>
+        {% endfor %}
+    </ul>
     {% endif %}
 
     <script>
-        function copyText() {
-            var text = document.querySelector('textarea');
-            text.select();
-            document.execCommand('copy');
+        // Hàm xóa văn bản đã nhập
+        function clearText() {
+            document.querySelector('textarea').value = '';
         }
     </script>
 </body>
