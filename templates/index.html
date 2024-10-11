@@ -3,39 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Extractor</title>
+    <title>Link Extractor & Replacer</title>
 </head>
 <body>
     <h1>Nhập văn bản chứa liên kết</h1>
     
     <!-- Form để nhập văn bản và thao tác -->
     <form method="post">
-        <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản chứa liên kết...">{{ request.form['text'] if 'text' in request.form else '' }}</textarea><br><br>
+        <!-- Khung nhập văn bản -->
+        <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản chứa liên kết...">{{ replaced_text if replaced_text else text }}</textarea><br><br>
         
         <!-- Nút Lọc Liên Kết -->
-        <button type="submit" name="filter_links">Lọc liên kết</button>
-        
-        <!-- Nút Tạo File Excel -->
-        <button type="submit" name="create_excel">Tạo file Excel</button>
-        
-        <!-- Nút Xóa văn bản -->
-        <button type="button" onclick="clearText()">Xóa văn bản</button>
+        <button type="submit" name="filter_links">Lọc liên kết</button><br><br>
+
+        <!-- Hiển thị các liên kết đã lọc và ô để nhập liên kết thay thế -->
+        {% if links %}
+        <h2>Các liên kết đã lọc:</h2>
+        <ul>
+            {% for link in links %}
+            <li>{{ link }}</li>
+            <input type="text" name="replacement_link" placeholder="Nhập liên kết thay thế cho {{ link }}">
+            {% endfor %}
+        </ul>
+        <br>
+        <!-- Nút Thay Liên Kết -->
+        <button type="submit" name="replace_links">Thay liên kết</button><br><br>
+        {% endif %}
     </form>
 
-    <!-- Hiển thị kết quả sau khi lọc -->
-    {% if links %}
-    <h2>Các liên kết đã lọc:</h2>
-    <ul>
-        {% for link in links %}
-        <li>{{ link }}</li>
-        {% endfor %}
-    </ul>
+    <!-- Hiển thị kết quả sau khi thay liên kết -->
+    {% if replaced_text %}
+    <h2>Văn bản sau khi thay liên kết:</h2>
+    <textarea rows="10" cols="50">{{ replaced_text }}</textarea><br><br>
+    <button onclick="copyText()">Sao chép văn bản</button>
     {% endif %}
 
     <script>
-        // Hàm xóa văn bản đã nhập
-        function clearText() {
-            document.querySelector('textarea').value = '';
+        // Hàm sao chép văn bản
+        function copyText() {
+            var textarea = document.querySelector('textarea');
+            textarea.select();
+            document.execCommand('copy');
+            alert('Văn bản đã được sao chép!');
         }
     </script>
 </body>
