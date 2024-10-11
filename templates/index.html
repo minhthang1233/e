@@ -28,10 +28,11 @@
         <ul>
             {% for link in links %}
             <li>{{ link }}</li>
-            <input type="text" name="replacement_link" placeholder="Nhập liên kết thay thế cho {{ link }}">
             {% endfor %}
         </ul>
         <br>
+        <h3>Nhập liên kết thay thế (mỗi liên kết trên một dòng, theo thứ tự tương ứng):</h3>
+        <textarea name="replacement_links" rows="10" cols="50" placeholder="Nhập các liên kết thay thế tại đây..."></textarea><br>
         <!-- Nút Thay Liên Kết -->
         <button type="submit" name="replace_links">Thay liên kết</button><br><br>
         {% endif %}
