@@ -26,9 +26,9 @@ def create_excel(links):
     ws['E1'] = 'Sub_id4'
     ws['F1'] = 'Sub_id5'
     
-    # Ghi các link theo chiều dọc, bắt đầu từ hàng số 2
-    for idx, link in enumerate(links, start=2):
-        ws[f'A{idx}'] = link  # Ghi vào cột A, bắt đầu từ hàng 2
+    # Ghi các liên kết vào cột A, bắt đầu từ hàng số 2
+    for idx, link in enumerate(links, start=2):  # Bắt đầu từ hàng 2
+        ws[f'A{idx}'] = link  # Ghi vào cột A
     
     # Lưu file Excel vào bộ nhớ tạm
     excel_file = io.BytesIO()
