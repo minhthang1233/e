@@ -12,9 +12,8 @@ def extract_links(text):
 
 # Hàm thay thế liên kết trong văn bản
 def replace_links(text, original_links, replacement_links):
-    for i in range(len(original_links)):
-        if i < len(replacement_links) and replacement_links[i]:  # Kiểm tra nếu có liên kết thay thế
-            text = text.replace(original_links[i], replacement_links[i])  # Thay thế theo thứ tự
+    for i in range(min(len(original_links), len(replacement_links))):
+        text = text.replace(original_links[i], replacement_links[i])  # Thay thế theo thứ tự
     return text
 
 @app.route("/", methods=["GET", "POST"])
