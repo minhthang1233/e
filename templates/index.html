@@ -3,57 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Extractor & Replacer</title>
+    <title>Lọc và Thay Thế Liên Kết</title>
     <style>
-        .scrollable {
-            max-height: 200px;
-            overflow-y: scroll;
-            border: 1px solid #ccc;
-            padding: 10px;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .section {
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .section-header {
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Nhập văn bản chứa liên kết</h1>
-    
-    <form method="post">
-        <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản chứa liên kết...">{{ replaced_text if replaced_text else text }}</textarea><br><br>
-        
-        <button type="submit" name="create_excel">Tạo file Excel</button>
-        <button type="submit" name="filter_links">Lọc liên kết</button>
-        <button type="submit" name="clear_text">Xóa văn bản</button><br><br>
+    <h1>Lọc và Thay Thế Liên Kết</h1>
 
-        {% if links %}
-        <h2>Các liên kết đã lọc:</h2>
-        <div class="scrollable">
-            <ul>
-                {% for link in links %}
+    <div class="section">
+        <h2 class="section-header">Nhập Văn Bản</h2>
+        <form method="POST">
+            <textarea name="text" rows="6" placeholder="Nhập văn bản ở đây để lọc liên kết...">{{ text }}</textarea>
+            <div>
+                <button type="submit" name="filter_links">Lọc Liên Kết</button>
+                <button type="submit" name="create_excel">Tạo file Excel</button>
+                <button type="submit" name="clear_text">Xóa Văn Bản</button>
+            </div>
+        </form>
+
+        <h3>Các Liên Kết Đã Tìm Thấy:</h3>
+        <ul>
+            {% for link in links %}
                 <li>{{ link }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <br>
+            {% endfor %}
+        </ul>
 
-        <h3>Nhập liên kết thay thế (mỗi liên kết trên một dòng, theo thứ tự tương ứng):</h3>
-        <textarea name="replacement_links" rows="10" cols="50" placeholder="Nhập các liên kết thay thế tại đây..."></textarea><br>
-        
-        <button type="submit" name="replace_links">Thay liên kết</button><br><br>
-        {% endif %}
-    </form>
+        <h3>Nhập Liên Kết Thay Thế:</h3>
+        <form method="POST">
+            <textarea name="replacement_links" rows="6" placeholder="Nhập các liên kết thay thế, mỗi liên kết trên một dòng..."></textarea>
+            <div>
+                <button type="submit" name="replace_links">Thay Liên Kết</button>
+            </div>
+        </form>
 
-    {% if replaced_text %}
-    <h2>Văn bản sau khi thay liên kết:</h2>
-    <textarea rows="10" cols="50">{{ replaced_text }}</textarea><br><br>
-    <button onclick="copyText()">Sao chép văn bản</button>
-    {% endif %}
-
-    <script>
-        function copyText() {
-            var textarea = document.querySelector('textarea');
-            textarea.select();
-            document.execCommand('copy');
-            alert('Văn bản đã được sao chép!');
-        }
-    </script>
+        <h3>Văn Bản Đã Thay Đổi:</h3>
+        <textarea rows="6" readonly>{{ replaced_text }}</textarea>
+    </div>
 </body>
 </html>
