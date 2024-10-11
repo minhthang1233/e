@@ -1,40 +1,44 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extractor and Replace Links</title>
-    <style>
-        textarea {
-            width: 100%;
-            height: 100px;
-        }
-        .scrollable {
-            height: 100px;
-            overflow-y: scroll;
-            width: 100%;
-        }
-    </style>
-</head>
-<body>
-    <h1>Nhập văn bản để lọc và thay thế liên kết</h1>
+from flask import Flask, request, render_template
+import re
+import pandas as pd
+import os
 
-    <form method="post">
-        <h3>Văn bản</h3>
-        <textarea name="text" placeholder="Nhập văn bản chứa liên kết vào đây...">{{ request.form.get('text', '') }}</textarea><br>
-        
-        <h3>Các liên kết lọc được</h3>
-        <div class="scrollable">
-            {% for link in extracted_links %}
-                <p>{{ link }}</p>
-            {% endfor %}
-        </div><br>
-        
-        <h3>Nhập liên kết thay thế (mỗi liên kết một dòng)</h3>
-        <textarea name="replace_links" placeholder="Nhập các liên kết thay thế..."></textarea><br>
+app = Flask(__name__)
 
-        <button type="submit">Lọc liên kết</button>
-        <button type="submit" name="clear">Xóa văn bản</button><br><br>
-    </form>
+# Hàm lọc các liên kết từ văn bản
+def extract_links(text):
+    url_pattern = r'(https?://[^\s]+)'
+    links = re.findall(url_pattern, text)
+    return links
 
-    {% if replaced_text
+# Hàm thay thế các liên kết trong văn bản
+def replace_links(text, links, replacements):
+    for i, link in enumerate(links):
+        if i < len(replacements):
+            text = text.replace(link, replacements[i])
+    return text
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    extracted_links = []
+    replaced_text = ""
+    
+    if request.method == "POST":
+        if "text" in request.form:
+            text = request.form["text"]
+            extracted_links = extract_links(text)
+
+            # Khi người dùng nhập vào các liên kết thay thế
+            if "replace_links" in request.form:
+                replacements = request.form["replace_links"].splitlines()
+                replaced_text = replace_links(text, extracted_links, replacements)
+
+        # Xóa văn bản nếu người dùng yêu cầu
+        if "clear" in request.form:
+            text = ""
+            extracted_links = []
+
+    return render_template("index.html", extracted_links=extracted_links, replaced_text=replaced_text)
+
+if __name__ == "__main__":
+    app.run(debug=True)
