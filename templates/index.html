@@ -7,20 +7,9 @@
 </head>
 <body>
     <h1>Nhập văn bản để lọc liên kết</h1>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post">
         <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản ở đây..."></textarea><br>
-        <button type="submit" name="action" value="extract">OK</button>
+        <button type="submit">OK</button>
     </form>
-
-    <h2>Tải lên file CSV để thay thế liên kết</h2>
-    <form method="post" enctype="multipart/form-data">
-        <input type="file" name="csv_file" accept=".csv" required>
-        <button type="submit" name="action" value="upload">Tải lên CSV</button>
-    </form>
-
-    {% if updated_text %}
-        <h3>Văn bản đã thay thế:</h3>
-        <pre>{{ updated_text }}</pre>
-    {% endif %}
 </body>
 </html>
