@@ -7,9 +7,16 @@
 </head>
 <body>
     <h1>Nhập văn bản để lọc liên kết</h1>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản ở đây..."></textarea><br>
+        <label for="file">Tải lên file CSV:</label>
+        <input type="file" name="file" accept=".csv"><br>
         <button type="submit">OK</button>
     </form>
+
+    {% if modified_text %}
+    <h2>Kết quả văn bản đã thay thế:</h2>
+    <textarea rows="10" cols="50">{{ modified_text }}</textarea>
+    {% endif %}
 </body>
 </html>
