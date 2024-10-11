@@ -1,9 +1,11 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_file
 import re
+import pandas as pd
+import os
 
 app = Flask(__name__)
 
-# Hàm lọc các liên kết từ văn bản
+# Hàm lọc liên kết từ văn bản
 def extract_links(text):
     url_pattern = r'(https?://[^\s]+)'
     links = re.findall(url_pattern, text)
@@ -24,13 +26,33 @@ def index():
     if request.method == "POST":
         text = request.form.get("text", "")
         
-        if 'filter_links' in request.form:  # Khi nhấn nút "Lọc liên kết"
+        # Khi nhấn nút "Tạo file Excel"
+        if 'create_excel' in request.form:
+            links = extract_links(text)
+            if links:
+                # Tạo DataFrame để lưu liên kết vào file Excel
+                data = {
+                    "Liên kết gốc": links,
+                    "Thay thế": [None] * len(links)
+                }
+                df = pd.DataFrame(data)
+                filename = "extracted_links.xlsx"
+                df.to_excel(filename, index=False)
+                return send_file(filename, as_attachment=True)
+
+        # Khi nhấn nút "Lọc liên kết"
+        elif 'filter_links' in request.form:
             links = extract_links(text)
         
-        if 'replace_links' in request.form:  # Khi nhấn nút "Thay liên kết"
+        # Khi nhấn nút "Thay liên kết"
+        elif 'replace_links' in request.form:
             links = extract_links(text)
             replacement_links = request.form.getlist("replacement_link")
             replaced_text = replace_links(text, links, replacement_links)
+
+        # Khi nhấn nút "Xóa văn bản"
+        elif 'clear_text' in request.form:
+            text = ""
     
     return render_template("index.html", text=text, links=links, replaced_text=replaced_text)
 
