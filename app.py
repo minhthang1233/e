@@ -1,55 +1,46 @@
-from flask import Flask, request, render_template, send_file, redirect, url_for
+from flask import Flask, request, render_template, send_file
 import re
 import pandas as pd
 import os
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# Định nghĩa đường dẫn lưu file CSV đã upload
-UPLOAD_FOLDER = './uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-ALLOWED_EXTENSIONS = {'csv'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+# Hàm lọc các liên kết từ văn bản
 def extract_links(text):
-    # Sử dụng biểu thức chính quy để tìm các liên kết
     url_pattern = r'(https?://[^\s]+)'
     links = re.findall(url_pattern, text)
     return links
 
-def replace_links(text, replacements):
-    # Thay thế các liên kết trong văn bản dựa trên file CSV
-    for original, replacement in replacements.items():
-        text = text.replace(original, replacement)
-    return text
-
 @app.route("/", methods=["GET", "POST"])
 def index():
-    replaced_text = None  # Để lưu trữ văn bản sau khi thay thế
+    links = None  # Lưu trữ danh sách liên kết
     if request.method == "POST":
-        if 'file' not in request.files:
-            return "No file part"
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
+        if 'filter_links' in request.form:  # Khi nhấn nút "Lọc liên kết"
+            text = request.form["text"]
+            links = extract_links(text)
+        elif 'create_excel' in request.form:  # Khi nhấn nút "Tạo file Excel"
+            text = request.form["text"]
+            links = extract_links(text)
+            if links:
+                # Tạo DataFrame với các cột tiêu đề
+                data = {
+                    "Liên kết gốc": links,
+                    "Sub_id1": [None] * len(links),
+                    "Sub_id2": [None] * len(links),
+                    "Sub_id3": [None] * len(links),
+                    "Sub_id4": [None] * len(links),
+                    "Sub_id5": [None] * len(links)
+                }
+                df = pd.DataFrame(data)
 
-            # Đọc file CSV
-            df = pd.read_csv(filepath)
-            if 'Liên kết gốc' in df.columns and 'Liên kết thay thế' in df.columns:
-                # Tạo từ điển liên kết gốc và liên kết thay thế
-                replacements = dict(zip(df['Liên kết gốc'], df['Liên kết thay thế']))
+                # Lưu DataFrame vào file Excel
+                filename = "extracted_links.xlsx"
+                df.to_excel(filename, index=False)
 
-                # Lấy văn bản từ form
-                text = request.form["text"]
-                # Lọc và thay thế các liên kết
-                replaced_text = replace_links(text, replacements)
+                # Tải file Excel về
+                return send_file(filename, as_attachment=True)
 
-    return render_template("index.html", replaced_text=replaced_text)
+    return render_template("index.html", links=links)
 
 if __name__ == "__main__":
     app.run(debug=True)
