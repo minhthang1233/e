@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extract Links to Excel</title>
+    <title>Tạo File Excel</title>
 </head>
 <body>
-    <h2>Nhập văn bản chứa các liên kết</h2>
-    <form action="/extract-links" method="post">
-        <label for="text">Văn bản:</label><br>
-        <textarea id="text" name="text" rows="10" cols="50"></textarea><br><br>
-        <input type="submit" value="OK">
+    <h1>Tạo File Excel từ Liên kết</h1>
+    <form action="/extract-links" method="post" enctype="multipart/form-data">
+        <textarea name="text" rows="10" cols="30" placeholder="Nhập văn bản chứa các liên kết..."></textarea><br>
+        <input type="file" name="csv_file" accept=".csv"><br>
+        <input type="submit" value="Tạo file Excel">
     </form>
 </body>
 </html>
