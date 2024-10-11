@@ -3,70 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Extractor & Replacer</title>
+    <title>Extractor and Replace Links</title>
     <style>
-        /* Phần hiển thị danh sách liên kết sẽ gọn hơn với thanh cuộn */
+        textarea {
+            width: 100%;
+            height: 100px;
+        }
         .scrollable {
-            max-height: 200px; /* Chiều cao tối đa của khung chứa liên kết */
-            overflow-y: scroll; /* Bật thanh cuộn dọc */
-            border: 1px solid #ccc; /* Thêm viền để dễ nhìn */
-            padding: 10px;
+            height: 100px;
+            overflow-y: scroll;
+            width: 100%;
         }
     </style>
 </head>
 <body>
-    <h1>Nhập văn bản chứa liên kết</h1>
-    
-    <!-- Form để nhập văn bản và thao tác -->
+    <h1>Nhập văn bản để lọc và thay thế liên kết</h1>
+
     <form method="post">
-        <!-- Khung nhập văn bản -->
-        <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản chứa liên kết...">{{ replaced_text if replaced_text else text }}</textarea><br><br>
+        <h3>Văn bản</h3>
+        <textarea name="text" placeholder="Nhập văn bản chứa liên kết vào đây...">{{ request.form.get('text', '') }}</textarea><br>
         
-        <!-- Nút Tạo file Excel -->
-        <button type="submit" name="create_excel">Tạo file Excel</button>
-
-        <!-- Nút Lọc Liên Kết -->
-        <button type="submit" name="filter_links">Lọc liên kết</button>
-
-        <!-- Nút Xóa Văn Bản -->
-        <button type="submit" name="clear_text">Xóa văn bản</button><br><br>
-
-        <!-- Hiển thị các liên kết đã lọc với thanh cuộn -->
-        {% if links %}
-        <h2>Các liên kết đã lọc:</h2>
+        <h3>Các liên kết lọc được</h3>
         <div class="scrollable">
-            <ul>
-                {% for link in links %}
-                <li>{{ link }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <br>
-
-        <!-- Ô nhập các liên kết thay thế -->
-        <h3>Nhập liên kết thay thế (mỗi liên kết trên một dòng, theo thứ tự tương ứng):</h3>
-        <textarea name="replacement_links" rows="10" cols="50" placeholder="Nhập các liên kết thay thế tại đây..."></textarea><br>
+            {% for link in extracted_links %}
+                <p>{{ link }}</p>
+            {% endfor %}
+        </div><br>
         
-        <!-- Nút Thay Liên Kết -->
-        <button type="submit" name="replace_links">Thay liên kết</button><br><br>
-        {% endif %}
+        <h3>Nhập liên kết thay thế (mỗi liên kết một dòng)</h3>
+        <textarea name="replace_links" placeholder="Nhập các liên kết thay thế..."></textarea><br>
+
+        <button type="submit">Lọc liên kết</button>
+        <button type="submit" name="clear">Xóa văn bản</button><br><br>
     </form>
 
-    <!-- Hiển thị kết quả sau khi thay liên kết -->
     {% if replaced_text %}
-    <h2>Văn bản sau khi thay liên kết:</h2>
-    <textarea rows="10" cols="50">{{ replaced_text }}</textarea><br><br>
-    <button onclick="copyText()">Sao chép văn bản</button>
+        <h3>Kết quả sau khi thay thế:</h3>
+        <textarea readonly>{{ replaced_text }}</textarea>
     {% endif %}
-
-    <script>
-        // Hàm sao chép văn bản
-        function copyText() {
-            var textarea = document.querySelector('textarea');
-            textarea.select();
-            document.execCommand('copy');
-            alert('Văn bản đã được sao chép!');
-        }
-    </script>
 </body>
 </html>
