@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Link Extractor & Replacer</title>
     <style>
-        /* Phần hiển thị danh sách liên kết sẽ gọn hơn với thanh cuộn */
         .scrollable {
-            max-height: 200px; /* Chiều cao tối đa của khung chứa liên kết */
-            overflow-y: scroll; /* Bật thanh cuộn dọc */
-            border: 1px solid #ccc; /* Thêm viền để dễ nhìn */
+            max-height: 200px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
             padding: 10px;
         }
     </style>
@@ -17,21 +16,13 @@
 <body>
     <h1>Nhập văn bản chứa liên kết</h1>
     
-    <!-- Form để nhập văn bản và thao tác -->
     <form method="post">
-        <!-- Khung nhập văn bản -->
         <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản chứa liên kết...">{{ replaced_text if replaced_text else text }}</textarea><br><br>
         
-        <!-- Nút Tạo file Excel -->
         <button type="submit" name="create_excel">Tạo file Excel</button>
-
-        <!-- Nút Lọc Liên Kết -->
         <button type="submit" name="filter_links">Lọc liên kết</button>
-
-        <!-- Nút Xóa Văn Bản -->
         <button type="submit" name="clear_text">Xóa văn bản</button><br><br>
 
-        <!-- Hiển thị các liên kết đã lọc với thanh cuộn -->
         {% if links %}
         <h2>Các liên kết đã lọc:</h2>
         <div class="scrollable">
@@ -43,16 +34,13 @@
         </div>
         <br>
 
-        <!-- Ô nhập các liên kết thay thế -->
         <h3>Nhập liên kết thay thế (mỗi liên kết trên một dòng, theo thứ tự tương ứng):</h3>
         <textarea name="replacement_links" rows="10" cols="50" placeholder="Nhập các liên kết thay thế tại đây..."></textarea><br>
         
-        <!-- Nút Thay Liên Kết -->
         <button type="submit" name="replace_links">Thay liên kết</button><br><br>
         {% endif %}
     </form>
 
-    <!-- Hiển thị kết quả sau khi thay liên kết -->
     {% if replaced_text %}
     <h2>Văn bản sau khi thay liên kết:</h2>
     <textarea rows="10" cols="50">{{ replaced_text }}</textarea><br><br>
@@ -60,7 +48,6 @@
     {% endif %}
 
     <script>
-        // Hàm sao chép văn bản
         function copyText() {
             var textarea = document.querySelector('textarea');
             textarea.select();
