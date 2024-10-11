@@ -1,42 +1,55 @@
-from flask import Flask, request, render_template, send_file
-import re
-import pandas as pd
+from flask import Flask, request, jsonify, render_template
+import urllib.parse
+import requests
 import os
+import re
 
 app = Flask(__name__)
 
-def extract_links(text):
-    # Sử dụng biểu thức chính quy để tìm các liên kết
-    url_pattern = r'(https?://[^\s]+)'
-    links = re.findall(url_pattern, text)
-    return links
+# Hàm để mã hóa URL
+def encode_link(link):
+    base_url = link.split('?')[0]  # Lấy phần URL trước dấu hỏi
+    return urllib.parse.quote(base_url, safe='')  # Mã hóa phần đó
 
-@app.route("/", methods=["GET", "POST"])
+# Hàm để giải mã liên kết rút gọn thành liên kết đầy đủ
+def resolve_short_link(short_url):
+    try:
+        response = requests.head(short_url, allow_redirects=True)
+        return response.url  # Trả về URL đầy đủ sau khi chuyển hướng
+    except requests.RequestException:
+        return None
+
+@app.route('/')
 def index():
-    if request.method == "POST":
-        text = request.form["text"]
-        links = extract_links(text)
-        
-        if links:
-            # Tạo DataFrame với các cột tiêu đề
-            data = {
-                "Liên kết gốc": links,
-                "Sub_id1": [None] * len(links),
-                "Sub_id2": [None] * len(links),
-                "Sub_id3": [None] * len(links),
-                "Sub_id4": [None] * len(links),
-                "Sub_id5": [None] * len(links)
-            }
-            df = pd.DataFrame(data)
+    return render_template('index.html')
 
-            # Lưu DataFrame vào file Excel
-            filename = "extracted_links.xlsx"
-            df.to_excel(filename, index=False)
+# Hàm xử lý kết quả khi người dùng nhập liên kết
+@app.route('/generate_links', methods=['POST'])
+def generate_links():
+    data = request.get_json()  # Nhận dữ liệu JSON từ yêu cầu
+    input_text = data.get('text')  # Lấy văn bản đầu vào
 
-            # Tải file Excel về
-            return send_file(filename, as_attachment=True)
+    if not input_text:
+        return jsonify(error="Vui lòng cung cấp văn bản.")  # Trả về lỗi nếu không có văn bản
 
-    return render_template("index.html")
+    # Tìm tất cả các liên kết trong văn bản
+    short_links = re.findall(r'https?://(?:vn\.shp\.ee|s\.shopee\.vn)/[^\s]+', input_text)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    # Tạo một dictionary để lưu các liên kết mới
+    new_links = {}
+    for short_link in short_links:
+        full_link = resolve_short_link(short_link)  # Giải mã liên kết rút gọn
+        if full_link:
+            encoded_link = encode_link(full_link)  # Mã hóa liên kết
+            new_link = f"https://shope.ee/an_redir?origin_link={encoded_link}&affiliate_id=17385530062&sub_id=1review"
+            new_links[short_link] = new_link
+
+    # Thay thế các liên kết trong văn bản
+    for short_link, new_link in new_links.items():
+        input_text = input_text.replace(short_link, new_link)
+
+    return jsonify(results=[input_text])  # Trả về văn bản đã thay thế dưới dạng JSON
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))  # Sử dụng biến môi trường PORT
+    app.run(host='0.0.0.0', port=port)
