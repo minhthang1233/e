@@ -18,8 +18,17 @@ def create_excel(links):
     ws = wb.active
     ws.title = "Links"
     
+    # Ghi các nhãn cho hàng số 1
+    ws['A1'] = 'Liên kết gốc'
+    ws['B1'] = 'Sub_id1'
+    ws['C1'] = 'Sub_id2'
+    ws['D1'] = 'Sub_id3'
+    ws['E1'] = 'Sub_id4'
+    ws['F1'] = 'Sub_id5'
+    
+    # Ghi các link theo chiều ngang bắt đầu từ hàng số 2
     for idx, link in enumerate(links, start=1):
-        ws[f'A{idx}'] = link
+        ws.cell(row=2, column=idx, value=link)
     
     # Lưu file Excel vào bộ nhớ tạm
     excel_file = io.BytesIO()
