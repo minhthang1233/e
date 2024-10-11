@@ -3,14 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo File Excel</title>
+    <title>Extractor Links</title>
 </head>
 <body>
-    <h1>Tạo File Excel từ Liên kết</h1>
-    <form action="/extract-links" method="post" enctype="multipart/form-data">
-        <textarea name="text" rows="10" cols="30" placeholder="Nhập văn bản chứa các liên kết..."></textarea><br>
-        <input type="file" name="csv_file" accept=".csv"><br>
-        <input type="submit" value="Tạo file Excel">
+    <h1>Nhập văn bản để lọc liên kết</h1>
+    <form method="post">
+        <textarea name="text" rows="10" cols="50" placeholder="Nhập văn bản ở đây..."></textarea><br>
+        <button type="submit">Lọc liên kết</button>
     </form>
+
+    {% if links %}
+        <h2>Các liên kết đã lọc:</h2>
+        <ul>
+            {% for link in links %}
+                <li>{{ link }}</li>
+            {% endfor %}
+        </ul>
+        <p><a href="{{ filename }}">Tải xuống file Excel chứa các liên kết</a></p>
+    {% else %}
+        <p>Không có liên kết nào được tìm thấy.</p>
+    {% endif %}
 </body>
 </html>
